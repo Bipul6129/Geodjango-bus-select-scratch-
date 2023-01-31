@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <style>
+        #map{
+            width:50%;
+            height:50vh;
+        }
+    </style>
+    <script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Trial page</h1>
+    <div id="map"></div>
+    <select id="yatayat">
+        <option value="Arko yatayat" selected="selected">Arko yatayat</option>
+        <option value="Nepal yatayat">Nepal yatayat</option>
+    </select>
+    <button id="filter">Click</button>
+    <h1 id="yatayathead">Select any Bus</h1>
+</body>
+</html>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+<script>
+    var map = L.map('map').setView([27.705826,85.327043], 12.3);
+    document.getElementsByClassName( 'leaflet-control-attribution' )[0].style.display = 'none';
+    // var osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // }).addTo(map);
+    // osm.addTo(map);
+    var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+    });
+    Stamen_TonerLite.addTo(map);
+    
+    map.setMaxZoom(15);
+
+
+    marker1 = L.marker([0,0], {closeOnClick: false,autoClose: false}).addTo(map);
+    marker2 = L.marker([0,0], {closeOnClick: false,autoClose: false}).addTo(map);
+    markers = [marker1,marker2];
+    var detailarray=[];
+    var ip = "http://127.0.0.1:8000/media/";
+
+
+
+    document.getElementById("filter").addEventListener("click",function(){
+        var select = document.getElementById("yatayat");
+        var value = select.value;
+        var selectedvalue = select.options[select.selectedIndex].value;
+        $.ajax({
+        
+        url:'http://127.0.0.1:8000/bus-markers/'+selectedvalue,
+        data:{yatayat:'hello'},
+        type:'GET',
+        dataType:'json',
+        success:function(data){
+            console.log(data);
+            console.log(data.features.length);
+            for(i=0;i<data.features.length;i++){
+                console.log(data.features[i].geometry.coordinates[0]);
+                console.log(data.features[i].geometry.coordinates[1]);
+                lat=data.features[i].geometry.coordinates[0];
+                lon=data.features[i].geometry.coordinates[1];
+                markers[i].setLatLng([lon,lat]);
+                image = data.features[i].properties.bus_image;
+                yatayat = data.features[i].properties.yatayat;
+                detailarray[i]={yatayat:data.features[i].properties.yatayat}
+                console.log(image);
+                markers[i].bindPopup('<h4>'+yatayat+'</h4><img src="'+ip+image+'" style="width:100%;height:60%"></img>').addTo(map);
+                
+            }
+            
+            
+        }      
+    });
+
+
+    });
+        
+    markers[0].on('click',function(e){
+        // alert(detailarray[0].yatayat);
+        head = document.getElementById('yatayathead');
+        head.textContent = detailarray[0].yatayat;
+    });
+
+    markers[1].on('click',function(e){
+        // alert(detailarray[0].yatayat);
+        head = document.getElementById('yatayathead');
+        head.textContent = detailarray[0].yatayat;
+    });
+
+    
+
+    
+    
+
+
+</script>

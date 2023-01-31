@@ -1,0 +1,24 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+{% load leaflet_tags %}
+
+<H2>Landing page</H2>
+<div id="map"></div>
+<script>
+    
+    function our_layers(map,options){
+        
+        var datasets = new L.GeoJSON.AJAX("{% url 'incidence' %}",{
+
+        });
+        datasets.addTo(map);
+        console.log(datasets)
+    }
+
+    setInterval(5000);
+</script>
+{% leaflet_map "gis" callback="our_layers" %}
+
+{% endblock %}
+
+

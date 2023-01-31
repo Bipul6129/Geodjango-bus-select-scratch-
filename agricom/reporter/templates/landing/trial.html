@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <style>
+        #map{
+            width:100%;
+            height:100vh;
+        }
+    </style>
+    <script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Trial page</h1>
+    <div id="map"></div>
+</body>
+</html>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+<script>
+    var map = L.map('map').setView([27.705826,85.327043], 13);
+
+    // var osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // }).addTo(map);
+    // osm.addTo(map);
+    var Stamen_TonerLite = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+    });
+    Stamen_TonerLite.addTo(map);
+    
+    map.setMaxZoom(15);
+
+    // L.marker([27.705826,85.327043]).addTo(map);
+    var time=5000;
+    marker1 = L.marker([27.705826,85.327043]).addTo(map);
+    marker2 = L.marker([27.705826,85.327043]).addTo(map);
+    markers = [marker1,marker2];
+    
+    // setInterval(function(){
+
+        $.ajax({
+        url:'{% url "get_markers" %}',
+        type:'GET',
+        dataType:'json',
+        success:function(data){
+            console.log(data);
+            console.log(data.features.length);
+            for(i=0;i<data.features.length;i++){
+                console.log(data.features[i].geometry.coordinates[0]);
+                console.log(data.features[i].geometry.coordinates[1]);
+                lat=data.features[i].geometry.coordinates[0];
+                lon=data.features[i].geometry.coordinates[1];
+                latx=data.features[0].geometry.coordinates[0];
+                lony=data.features[1].geometry.coordinates[1];
+                markers[i].setLatLng([lon,lat]);
+            }
+            
+            
+        }      
+    });
+
+    // inc=0;
+    // setInterval(function(){
+    //     inc=inc+0.0009;
+    //     markers[1].setLatLng([lony+inc,latx+inc]);
+    //     console.log(lony+inc);
+
+    // },2000);
+
+    // },5000);
+
+    var popup = markers[0].bindPopup('<img src="https://images.pexels.com/photos/60597/dahlia-red-blossom-bloom-60597.jpeg?cs=srgb&dl=pexels-pixabay-60597.jpg&fm=jpg" style="width:200px;height:200px"></img>').openPopup();
+    popup.addTo(map);
+        
+
+    
+
+    
+    
+
+    // Stadia_AlidadeSmoothDark.addTo(map);
+</script>
